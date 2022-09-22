@@ -1,0 +1,3 @@
+# Database Seeding Notes 
+
+* Some database columsn (i.e. marina name) were rejected due to different encodings. 

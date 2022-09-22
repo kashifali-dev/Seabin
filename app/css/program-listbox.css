@@ -1,0 +1,13 @@
+[data-reach-listbox-button] {
+  width: 100%;
+  background-color: white;
+  height: 78px;
+}
+[data-reach-listbox-button][aria-expanded="true"] {
+  width: 100%;
+  background-color: white;
+}
+
+[data-reach-listbox-popover] {
+  background-color: white;
+}

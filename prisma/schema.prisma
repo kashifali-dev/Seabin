@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Unit {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  number        Int
+  // what is pi
+  // marina name is mapped from title
+  marinaName    String?
+  marinaAddress String?
+  country       String?
+  region        String?
+  lat           Float?
+  lng           Float?
+
+  records  UnitCollectionRecord[] // a unit can have multiple records
+  sponsors SponsorForUnit[]
+
+  Program   Program? @relation(fields: [programId], references: [id])
+  programId String?
+}
+
+model Sponsor {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  imageLink String
+
+  units SponsorForUnit[]
+}
+
+enum SponsorshipTier {
+  UNIT
+  MAJOR
+  PRINCIPAL
+}
+
+//Sponsorship for particular units - mapping
+model SponsorForUnit {
+  Unit      Unit            @relation(fields: [unitId], references: [id])
+  unitId    String
+  Sponsor   Sponsor         @relation(fields: [sponsorId], references: [id])
+  sponsorId String
+  startDate DateTime        @default(now())
+  endDate   DateTime?
+  tier      SponsorshipTier
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@id([unitId, sponsorId, tier])
+}
+
+model UnitCollectionRecord {
+  id                                    String   @id @default(uuid())
+  createdAt                             DateTime @default(now())
+  updatedAt                             DateTime @updatedAt
+  dataCollectorName                     String
+  // collection date is a DD/MM/YYYY
+  collectionDate                        DateTime
+  totalWeightInGrams                    Float
+  hoursInOperation                      Int
+  terrestrialBiomassLandBasedPercentage Float
+  marineBiomassWaterBasedPercentage     Float
+  bycatch                               String
+  microplasticPelletsCount              BigInt?
+  foamPiecesCount                       BigInt?
+  plasticFoodWrappersSoftCount          BigInt?
+  foodPackagingHardCount                BigInt?
+  plasticLidsCount                      BigInt?
+  plasticStrawsCount                    BigInt?
+  plasticBagsCount                      BigInt?
+  plasticBottlesCount                   BigInt?
+  plasticUtensilsCount                  BigInt?
+  coffeeCupspaperCupsCount              BigInt?
+  plasticLollipopcottonBudSticksCount   BigInt?
+  unidentifiedPlasticItemsSoftCount     BigInt?
+  unidentifiedPlasticItemsHardCount     BigInt?
+  cigaretteButtsCount                   BigInt?
+  fishingGearCount                      BigInt?
+  fishingLineCount                      BigInt?
+  microfibersCount                      BigInt?
+  ropeGreaterthan5mmCount               BigInt?
+  cansCount                             BigInt?
+  tapeCount                             BigInt?
+  rubber                                BigInt?
+  tennisBallToyBallCount                BigInt?
+  faceMasksGlovesPPECount               BigInt?
+  syringesCount                         BigInt?
+  other                                 String?
+  estimatedMicroPlasticsCount           BigInt?
+  plasticsPerLitre                      Float?
+  pollutionIndex                        Int?
+  Unit                                  Unit?    @relation(fields: [unitId], references: [id]) // a record can only belong to a single unit
+  unitId                                String?
+}
+
+model Program {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String
+  units     Unit[]
+  rainfall  Rainfall[]
+}
+
+model Rainfall {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  date      DateTime
+  city      String
+  country   String
+  mm        Float
+  Program   Program? @relation(fields: [programId], references: [id])
+  programId String?
+}

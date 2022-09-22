@@ -1,0 +1,216 @@
+# Calculations for each visualisation 
+
+## Charts:
+    1. Estimated microplastics count 
+    2. Litter composition 
+    3. Litter over time
+    4. Plastic per liter 
+
+
+## Estimated Microplastics Count
+Estimated Microplastics is calculated by summing:
+
+* the total count of microplastic pellets, 
+* and microibers for a given time period. 
+* We divide each count by 1000 when displaying on the charts 
+
+Sample SQL Query 
+[source,sql,attributes]
+----
+SELECT 		 SUM("microplasticPelletsCount") as microplasticPelletsThousands,
+             SUM("microfibersCount")      as microFibersThousands,
+             EXTRACT(MONTH from "collectionDate")          as months
+      FROM "UnitCollectionRecord"
+      WHERE EXTRACT(YEAR FROM "collectionDate") > 2018
+      GROUP BY months
+      ORDER BY months;
+----
+Notes: 
+* There may be some extra categories in the future
+* There would be an additional 5 categories 
+* We can consider changing the name to "Microplastics count"
+* We may need to revisit some EMC calcluations (i.e. the UTS version has extrapolations that we cannot calculate - we can relabel, add to database etc.)
+
+## Litter composition 
+* Litter composition is a sum of all of the item types listed in the original spreadsheet 
+* This includes some as SUM and some as COUNT (for example, bycatch is non-numeric, so we SUM the entries rather than count)
+* On the charts, we display the top 15 elements
+* The complete list is found in the example query below
+* Once again, for each entry we round to the nearest decimal place, and divide by 1000 for the visualisations 
+
+Sample SQL Query
+[source, SQL,attributes]
+----
+SELECT SUM("terrestrialBiomassLandBasedPercentage") as terrestrialBiomassLandBasedPercentage, 
+	   SUM("marineBiomassWaterBasedPercentage") as marineBiomassWaterBasedPercentage, 
+	   COUNT("bycatch") as bycatch,
+	   SUM("microplasticPelletsCount") as microplasticPelletsCount, 
+	   SUM("foamPiecesCount") as foamPiecesCount, 
+	   SUM("plasticFoodWrappersSoftCount") as plasticFoodWrappersSoftCount,
+	   SUM("foodPackagingHardCount") as foodPackagingHardCount,
+	   SUM("plasticStrawsCount") as plasticStrawsCount, 
+	   SUM("plasticBagsCount") as plasticBagsCount,
+	   SUM("plasticBottlesCount") as plasticBottlesCount,
+	   SUM("plasticUtensilsCount") as plasticUtensilsCount,
+	   SUM("coffeeCupspaperCupsCount") as coffeeCupspaperCupsCount, 
+	   SUM("plasticLollipopcottonBudSticksCount") as plasticLollipopcottonBudSticksCount, 
+	   SUM("unidentifiedPlasticItemsSoftCount") as unidentifiedPlasticItemsSoftCount,
+	   SUM("unidentifiedPlasticItemsHardCount") as unidentifiedPlasticItemsHardCount, 
+	   SUM("cigaretteButtsCount") as cigaretteButtsCount, 
+	   SUM("fishingGearCount") as fishingGearCount, 
+	   SUM("fishingLineCount") as fishingLineCount, 
+	   SUM("microfibersCount") as microfibersCount, 
+	   SUM("ropeGreaterthan5mmCount") as ropeGreaterthan5mmCount,
+	   SUM("cansCount") as cansCount,
+	   SUM("tapeCount") as tapeCount,
+	   SUM("rubber") as rubber, 
+	   SUM("tennisBallToyBallCount") as tennisBallToyBallCount,
+	   SUM("faceMasksGlovesPPECount") as faceMasksGlovesPPECount, 
+	   SUM("syringesCount") as syringesCount,
+	   COUNT("other") as other
+FROM "UnitCollectionRecord"
+----
+Notes: 
+* We can remove the 'counts' - these will never be in the top 15 
+* Terrestrial marine biomass can be taken off as well 
+* Marine biomass can be taken off as well 
+* These could be in a graph of their own
+
+## Litter over time 
+
+* Litter over time is calculated very similar to litter composition 
+* Similar to litter composition we sum the numerical elements, and count the non numerical
+* We include months as this data is also month oriented 
+* AS usual, this data is also divided by 1000 before being displayed 
+* This time we display all non 0 elements. 
+* as usual we divide this by 1000
+
+Sample SQL Query
+[source, sql,attributes]
+----
+SELECT SUM("terrestrialBiomassLandBasedPercentage") as terrestrialBiomassLandBasedPercentage, 
+	   SUM("marineBiomassWaterBasedPercentage") as marineBiomassWaterBasedPercentage, 
+	   COUNT("bycatch") as bycatch,
+	   SUM("microplasticPelletsCount") as microplasticPelletsCount, 
+	   SUM("foamPiecesCount") as foamPiecesCount, 
+	   SUM("plasticFoodWrappersSoftCount") as plasticFoodWrappersSoftCount,
+	   SUM("foodPackagingHardCount") as foodPackagingHardCount,
+	   SUM("plasticStrawsCount") as plasticStrawsCount, 
+	   SUM("plasticBagsCount") as plasticBagsCount,
+	   SUM("plasticBottlesCount") as plasticBottlesCount,
+	   SUM("plasticUtensilsCount") as plasticUtensilsCount,
+	   SUM("coffeeCupspaperCupsCount") as coffeeCupspaperCupsCount, 
+	   SUM("plasticLollipopcottonBudSticksCount") as plasticLollipopcottonBudSticksCount, 
+	   SUM("unidentifiedPlasticItemsSoftCount") as unidentifiedPlasticItemsSoftCount,
+	   SUM("unidentifiedPlasticItemsHardCount") as unidentifiedPlasticItemsHardCount, 
+	   SUM("cigaretteButtsCount") as cigaretteButtsCount, 
+	   SUM("fishingGearCount") as fishingGearCount, 
+	   SUM("fishingLineCount") as fishingLineCount, 
+	   SUM("microfibersCount") as microfibersCount, 
+	   SUM("ropeGreaterthan5mmCount") as ropeGreaterthan5mmCount,
+	   SUM("cansCount") as cansCount,
+	   SUM("tapeCount") as tapeCount,
+	   SUM("rubber") as rubber, 
+	   SUM("tennisBallToyBallCount") as tennisBallToyBallCount,
+	   SUM("faceMasksGlovesPPECount") as faceMasksGlovesPPECount, 
+	   SUM("syringesCount") as syringesCount,
+	   COUNT("other") as other,
+	   EXTRACT(MONTH from "collectionDate")   as months
+FROM "UnitCollectionRecord"
+WHERE EXTRACT(YEAR FROM "collectionDate") > 2018
+      GROUP BY months
+      ORDER BY months;
+----
+
+Notes: 
+* leave out biomass, other and bycatch 
+
+## Plastic Per Liter 
+
+* The plastics per litre chart has the most complex summations 
+* We chose elements that are mostly plastic or plastic like. 
+* We do not include microplastics here.
+
+Sample SQL Query
+[source,sql,attributes]
+----
+SELECT 
+	SUM("plasticFoodWrappersSoftCount") as softWrappers, 
+	SUM("plasticLidsCount") as plasticLids, 
+	SUM("plasticStrawsCount") as plasticStraws, 
+	SUM("plasticBagsCount") as plasticBags, 
+	SUM("plasticBottlesCount") as plasticBottles, 
+	SUM("plasticUtensilsCount") as plasticUtensils, 
+	SUM("plasticLollipopcottonBudSticksCount") as lollipopAndCottonBuds, 
+	SUM("unidentifiedPlasticItemsSoftCount") as unidentifiedSoftPlastics,
+	SUM("unidentifiedPlasticItemsHardCount") as unidentifiedHardPlastics, 
+EXTRACT(MONTH from "collectionDate")   as months
+FROM "UnitCollectionRecord"
+WHERE EXTRACT(YEAR FROM "collectionDate") > 2018
+      GROUP BY months
+      ORDER BY months;
+----
+
+* the overall math outlined below is essentially 
+* 25000 * hours in operation / each of the plastics per litre variables 
+
+[source,javascript,attributes]
+----
+ for (let i = 0; i < ppl["ppl"].length; i++) {
+    pplSums = pplSums.concat(
+      (25000 * parseInt(ppl["ppl"][i]["hoursinoperation"])) /
+        (parseInt(ppl["ppl"][i]["softwrappers"]) +
+          parseInt(ppl["ppl"][i]["plasticlids"]) +
+          parseInt(ppl["ppl"][i]["plasticstraws"]) +
+          parseInt(ppl["ppl"][i]["plasticbags"]) +
+          parseInt(ppl["ppl"][i]["plasticbottles"]) +
+          parseInt(ppl["ppl"][i]["plasticutensils"]) +
+          parseInt(ppl["ppl"][i]["lollipopandcottonbuds"]) +
+          parseInt(ppl["ppl"][i]["unidentifiedsoftplastics"]) +
+          parseInt(ppl["ppl"][i]["unidentifiedhardplastics"])) /
+        1000
+    );
+----
+
+Notes: 
+* we should include all litter types - we may want to change the PPL title 
+* We want to sum all litter types
+
+
+## All available fields 
+
+    * dataCollectorName
+    * collectionDate
+    * totalWeightInGrams
+    * hoursInOperation
+    * terrestrialBiomassLandBasedPercentage
+    * marineBiomassWaterBasedPercentage
+    * bycatch
+    * foamPiecesCount
+    * microplasticPelletsCount
+    * plasticFoodWrappersSoftCount
+    * foodPackagingHardCount
+    * plasticLidsCount
+    * plasticStrawsCount
+    * plasticBagsCount
+    * plasticBottlesCount
+    * plasticUtensilsCount
+    * coffeeCupspaperCupsCount
+    * plasticLollipopcottonBudSticksCountsticks
+    * unidentifiedPlasticItemsSoftCountSoft,
+    * unidentifiedPlasticItemsHardCountHard,
+    * cigaretteButtsCount
+    * fishingGearCount
+    * fishingLineCount
+    * microfibersCount
+    * ropeGreaterthan5mmCount
+    * cansCount
+    * tapeCount
+    * rubber  
+    * faceMasksGlovesPPECountGlovesPPE,
+    * syringesCount    
+    * other
+    * plasticsPerLitre
+    * estimatedMicroPlasticsCount
+    * pollutionIndex
+    * Unit ID 

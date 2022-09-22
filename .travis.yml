@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+ - 14
+services:
+  - docker
+
+branches:
+  only:
+    - main
+
+before_install:
+  - curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+  - ibmcloud plugin install container-registry
+  - ibmcloud login --apikey ${IBMCLOUD_API_KEY} --no-region
+  - ibmcloud target -g ${IBMCLOUD_RESOURCE_GROUP} 
+  - ibmcloud cr region-set ap-south
+  - ibmcloud cr login
+
+install:
+ - docker build . -t au.icr.io/ohp-dashboard/dashboard:${TRAVIS_COMMIT}
+ - docker push au.icr.io/ohp-dashboard/dashboard:${TRAVIS_COMMIT}
